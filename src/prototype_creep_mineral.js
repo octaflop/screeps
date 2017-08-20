@@ -258,7 +258,6 @@ let cleanUpLabs = function(creep) {
   creep.say('cleanup');
   if (_.sum(creep.carry) > 0) {
 
-
       for (let resource in creep.carry) {
         if (creep.carry[resource] === 0) {
           continue;
@@ -453,6 +452,27 @@ let checkNuke = function(creep) {
       creep.suicide();
       return true;
     }
+    
+let fillTowers = function(creep) {
+  this.say('fillTowers');
+  const towers = creep.room.findPropertyFilter(FIND_STRUCTURES, 'structureType', [STRUCTURE_TOWER], false, {
+    filter: object => object.energy < object.energyCapacity
+  });
+  if (towers.length === 0) {
+    this.say('random');
+    creep.moveRandom();
+    return false;
+  }
+
+  if (creep.carry.energy > 0) {
+    creep.moveToMy(towers[0]);
+    creep.transfer(towers[0], RESOURCE_ENERGY);
+  } else {
+    creep.moveToMy(creep.room.storage);
+    creep.withdraw(creep.room.storage, RESOURCE_ENERGY);
+  }
+  return true;
+};
 
 // TODO totally ugly copy&paste from creep_mineral to migrate to role_mineral
 Creep.prototype.handleMineralCreep = function() {
@@ -565,10 +585,16 @@ Creep.prototype.handleMineralCreep = function() {
     }
 
   if (!room.memory.reaction) {
-    cleanUpLabs(this);
+    if (cleanUpLabs(this)) {
+      return true;
+    } else {
+      fillTowers(this);
+      return true;
+    }
     //    creep.log('No reactions?');
-    return true;
   }
+
+  this.log('states');
 
   let state = states[this.memory.state];
 

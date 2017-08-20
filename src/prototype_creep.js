@@ -67,6 +67,7 @@ Creep.prototype.moveToMy = function(target, range, allowExits, cache) {
 
   if (search.path.length === 0 && !search.incomplete) {
     this.say('mtm 0');
+    this.log(`mtm 0: ${target} ${JSON.stringify(search)}`);
     this.move(this.pos.getDirectionTo(target));
     return OK;
   }
