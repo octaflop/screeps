@@ -27,16 +27,12 @@ roles.repairer.boostActions = ['repair'];
 //};
 
 roles.repairer.execute = function(creep) {
-  let execute = function(creep) {
     var structures;
     var structure;
     var i;
 
     creep.setNextSpawn();
     creep.spawnReplacement(1);
-    if (!creep.memory.move_wait) {
-      creep.memory.move_wait = 0;
-    }
 
     if (creep.memory.step <= 0) {
       structures = creep.room.findPropertyFilter(FIND_STRUCTURES, 'structureType', [STRUCTURE_WALL, STRUCTURE_RAMPART]);
@@ -60,7 +56,4 @@ roles.repairer.execute = function(creep) {
       return true;
     }
     return true;
-  };
-
-  return execute(creep);
 };
