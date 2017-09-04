@@ -13,14 +13,22 @@ roles.scout.settings = {
   maxLayoutAmount: 1
 };
 
-let haveNotSeen = function(creep, room) {
-  return creep.memory.search.seen.indexOf(room) === -1 &&
-    creep.memory.skip.indexOf(room) === -1;
-};
+/**
+ * Was so room already visited by the scout.
+ *
+ * @example alreadyVisited(Game.creeps['scout-123'], 'W5N7')
+ * @param {Object} creep - The scout creep.
+ * @param {string} roomName - The name of the room to check.
+ * @returns {boolean} - True when the room was visited.
+ */
+function alreadyVisited(creep, roomName) {
+  return creep.memory.search.seen.indexOf(roomName) > -1 ||
+    creep.memory.skip.indexOf(roomName) > -1;
+}
 
 let setNewTarget = function(creep) {
   for (let room of creep.memory.search.levels[creep.memory.search.level]) {
-    if (haveNotSeen(creep, room)) {
+    if (!alreadyVisited(creep, room)) {
       creep.memory.search.target = room;
       return true;
     }
@@ -34,7 +42,7 @@ let increaseSearchLevel = function(creep) {
     let rooms = Game.map.describeExits(room);
     for (let direction of Object.keys(rooms)) {
       let roomNext = rooms[direction];
-      if (haveNotSeen(creep, roomNext)) {
+      if (!alreadyVisited(creep, roomNext)) {
         creep.memory.search.levels[creep.memory.search.level + 1].push(roomNext);
         creep.memory.search.target = roomNext;
       }
